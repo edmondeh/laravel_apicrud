@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\Api\LoginPostRequest;
 use App\Http\Requests\Auth\Api\RegisterPostRequest;
 use App\Interfaces\AuthenticationServiceInterface;
 use App\Models\User;
@@ -21,21 +22,20 @@ class AuthenticationController extends Controller
         $this->authService = $authenticationService;
     }
 
-    public function login(Request $request)
+    public function login(LoginPostRequest $request)
     {
-        $attr = $request->validate([
-            'email' => 'required|string|email|',
-            'password' => 'required|string|min:6'
-        ]);
+        // Validatet attributes
+        $attr = $request->validated();
 
-        if (!Auth::attempt($attr)) {
-            return $this->error('Credentials not match', 401);
-        }
+        // Attempt to login the user
+        if (!$this->authService->loginUser($attr))
+            return $this->error(null, 'Credentials not match', 401);
 
-        return response()->json([
-            'token' => auth()->user()->createToken('API Token')->plainTextToken,
-            'token_type' => 'Bearer',
-        ]);
+        // Create api token
+        $token = auth()->user()->createToken('API Token')->plainTextToken;
+
+        // Return success response
+        return $this->success(null, "Success", $token);
     }
 
     public function register(RegisterPostRequest $request)
@@ -51,18 +51,18 @@ class AuthenticationController extends Controller
             return $this->error($user, "Error");
 
         // Create api token
-        $token = $this->authService->createToken($user);
+        //$token = $this->authService->createToken($user);
 
         // Return success response
-        return $this->success($user, "Success", $token);
+        return $this->success($user, "Success");
     }
 
     public function logout()
     {
+        // Delete Api Tokens
         auth()->user()->tokens()->delete();
 
-        return [
-            'message' => 'Tokens Revoked'
-        ];
+        // Return success response
+        return $this->success(null, "Tokens Revoked");
     }
 }

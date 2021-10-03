@@ -4,9 +4,15 @@ namespace App\Services;
 
 use App\Interfaces\AuthenticationServiceInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class AuthenticationService implements AuthenticationServiceInterface
 {
+    public function loginUser($attr)
+    {
+        return Auth::attempt($attr);
+    }
+
     public function createUser($attr)
     {
 //        User::create([
@@ -21,6 +27,6 @@ class AuthenticationService implements AuthenticationServiceInterface
 
     public function createToken($user)
     {
-        return $user->createToken('tokens')->plainTextToken;
+        return $user->createToken('API Token')->plainTextToken;
     }
 }

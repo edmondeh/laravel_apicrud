@@ -5,8 +5,17 @@ namespace App\Traits;
 trait JsonResponeses
 {
     // Return JsonResponse Success
-    public function success($data, $message = "Success", $token)
+    public function success($data, $message = "Success", $token = null)
     {
+        if (is_null($token))
+        {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => $data
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'message' => $message,
