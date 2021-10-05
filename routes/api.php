@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthenticationController;
+use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,3 +31,8 @@ Route::get('/unauthorized', function () {
 Route::post('/login', [AuthenticationController::class, 'login']);
 Route::post('/register', [AuthenticationController::class, 'register']);
 Route::post('/logout', [AuthenticationController::class, 'logout'])->middleware('auth:sanctum');
+
+
+Route::apiResource('users', UserController::class)->middleware('auth:sanctum');
+Route::apiResource('posts', PostController::class)->middleware('auth:sanctum');
+Route::apiResource('/posts/{post}/comments', CommentController::class)->middleware('auth:sanctum');
